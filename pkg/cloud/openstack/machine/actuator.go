@@ -149,7 +149,16 @@ func (oc *OpenstackClient) Create(ctx context.Context, cluster *machinev1.Cluste
 		userDataRendered = string(userData)
 	}
 
-	instance, err = machineService.InstanceCreate(fmt.Sprintf("%s/%s", cluster.ObjectMeta.Namespace, cluster.Name), machine.Name, providerSpec, userDataRendered, providerSpec.KeyName)
+	// NOTE(shadower): get the cluster name from the `cluster` object or the `machine`
+	var clusterName string
+	if cluster == nil {
+		clusterName = fmt.Sprintf("%s/%s", machine.Namespace, machine.Labels["machine.openshift.io/cluster-api-cluster"])
+		klog.Infof("cluster is nil, falling back to clusterName read from the machine: %s", clusterName)
+	} else {
+		clusterName = fmt.Sprintf("%s/%s", cluster.ObjectMeta.Namespace, cluster.Name)
+	}
+
+	instance, err = machineService.InstanceCreate(clusterName, machine.Name, providerSpec, userDataRendered, providerSpec.KeyName)
 	if err != nil {
 		return oc.handleMachineError(machine, apierrors.CreateMachine(
 			"error creating Openstack instance: %v", err))
