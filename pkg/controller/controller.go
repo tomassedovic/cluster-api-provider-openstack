@@ -22,6 +22,9 @@ import (
 	"k8s.io/client-go/kubernetes"
 	"sigs.k8s.io/cluster-api-provider-openstack/pkg/cloud/openstack"
 	"sigs.k8s.io/controller-runtime/pkg/manager"
+
+	clientconfigv1 "github.com/openshift/client-go/config/clientset/versioned/typed/config/v1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
 // AddToManagerFuncs is a list of functions to add all Controllers to the Manager
@@ -40,6 +43,9 @@ func AddToManager(m manager.Manager) error {
 
 func getActuatorParams(mgr manager.Manager) openstack.ActuatorParams {
 	config := mgr.GetConfig()
+
+	openShiftClient, err := clientconfigv1.NewForConfig(config)
+	infra, err := openShiftClient.Infrastructures().Get("cluster", metav1.GetOptions{})
 
 	kubeClient, err := kubernetes.NewForConfig(config)
 	if err != nil {
