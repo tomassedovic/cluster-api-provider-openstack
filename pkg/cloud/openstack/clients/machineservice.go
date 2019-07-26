@@ -304,6 +304,9 @@ func CreatePort(is *InstanceService, name string, net ServerNetwork, securityGro
 		Name:           name,
 		NetworkID:      net.networkID,
 		SecurityGroups: securityGroups,
+		AllowedAddressPairs: []ports.AddressPair{
+			{IPAddress: "172.24.0.7"},
+		},
 	}
 	if net.subnetID != "" {
 		portCreateOpts.FixedIPs = []ports.IP{{SubnetID: net.subnetID}}
