@@ -54,6 +54,10 @@ type OpenstackProviderSpec struct {
 	// A networks object. Required parameter when there are multiple networks defined for the tenant.
 	// When you do not specify the networks parameter, the server attaches to the only network created for the current tenant.
 	Networks []NetworkParam `json:"networks,omitempty"`
+
+	// Allowed Address Pairs is a list of IP addresses that ports will recognize and accept
+	AllowedAddressPairs []string `json:"allowedAddressPairs,omitempty"`
+
 	// The floatingIP which will be associated to the machine, only used for master.
 	// The floatingIP should have been created and haven't been associated.
 	FloatingIP string `json:"floatingIP,omitempty"`

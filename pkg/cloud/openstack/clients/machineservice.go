@@ -44,7 +44,6 @@ import (
 	"github.com/gophercloud/gophercloud/openstack/networking/v2/subnets"
 	"github.com/gophercloud/gophercloud/pagination"
 	"github.com/gophercloud/utils/openstack/clientconfig"
-	configclient "github.com/openshift/client-go/config/clientset/versioned/typed/config/v1"
 	machinev1 "github.com/openshift/cluster-api/pkg/apis/machine/v1beta1"
 	"github.com/openshift/cluster-api/pkg/util"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -386,7 +385,7 @@ func getImageID(is *InstanceService, imageName string) (string, error) {
 }
 
 // InstanceCreate creates a compute instance
-func (is *InstanceService) InstanceCreate(clusterName string, name string, clusterSpec *openstackconfigv1.OpenstackClusterProviderSpec, config *openstackconfigv1.OpenstackProviderSpec, cmd string, keyName string, configClient configclient.ConfigV1Interface) (instance *Instance, err error) {
+func (is *InstanceService) InstanceCreate(clusterName string, name string, clusterSpec *openstackconfigv1.OpenstackClusterProviderSpec, config *openstackconfigv1.OpenstackProviderSpec, cmd string, keyName string) (instance *Instance, err error) {
 	var createOpts servers.CreateOptsBuilder
 	if config == nil {
 		return nil, fmt.Errorf("create Options need be specified to create instace")
@@ -454,22 +453,14 @@ func (is *InstanceService) InstanceCreate(clusterName string, name string, clust
 		}
 	}
 
-	clusterInfra, err := configClient.Infrastructures().Get("cluster", metav1.GetOptions{})
-	if err != nil {
-		return nil, fmt.Errorf("Failed to retrieve cluster Infrastructure object: %v", err)
-	}
-
+	// Check if Allowed Address Pairs added to machine config. If so, create Address Pair object
 	allowedAddressPairs := []ports.AddressPair{}
-	if clusterInfra != nil && clusterInfra.Status.PlatformStatus != nil && clusterInfra.Status.PlatformStatus.OpenStack != nil {
-		clusterVips := []string{
-			clusterInfra.Status.PlatformStatus.OpenStack.APIServerInternalIP,
-			clusterInfra.Status.PlatformStatus.OpenStack.NodeDNSIP,
-			clusterInfra.Status.PlatformStatus.OpenStack.IngressIP,
-		}
-
-		for _, vip := range clusterVips {
+	if config.AllowedAddressPairs != nil && len(config.AllowedAddressPairs) > 0 {
+		for _, vip := range config.AllowedAddressPairs {
 			if vip != "" {
 				allowedAddressPairs = append(allowedAddressPairs, ports.AddressPair{IPAddress: vip})
+			} else {
+				return nil, fmt.Errorf("Empty address pair passed. Please check your machine config and try again")
 			}
 		}
 	}

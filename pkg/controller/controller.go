@@ -19,7 +19,6 @@ package controller
 import (
 	"k8s.io/klog"
 
-	configclient "github.com/openshift/client-go/config/clientset/versioned/typed/config/v1"
 	"k8s.io/client-go/kubernetes"
 	"sigs.k8s.io/cluster-api-provider-openstack/pkg/cloud/openstack"
 	"sigs.k8s.io/controller-runtime/pkg/manager"
@@ -46,15 +45,10 @@ func getActuatorParams(mgr manager.Manager) openstack.ActuatorParams {
 	if err != nil {
 		klog.Fatalf("Could not create kubernetes client to talk to the apiserver: %v", err)
 	}
-	configClient, err := configclient.NewForConfig(config)
-	if err != nil {
-		klog.Fatalf("Failed to create a config client to talk to the apiserver: %v", err)
-	}
 
 	return openstack.ActuatorParams{
 		Client:        mgr.GetClient(),
 		KubeClient:    kubeClient,
-		ConfigClient:  configClient,
 		Scheme:        mgr.GetScheme(),
 		EventRecorder: mgr.GetEventRecorderFor("openstack_controller"),
 	}

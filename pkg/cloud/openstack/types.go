@@ -17,7 +17,6 @@ limitations under the License.
 package openstack
 
 import (
-	configclient "github.com/openshift/client-go/config/clientset/versioned/typed/config/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/tools/record"
@@ -28,7 +27,6 @@ import (
 type ActuatorParams struct {
 	KubeClient    kubernetes.Interface
 	Client        client.Client
-	ConfigClient  configclient.ConfigV1Interface
 	EventRecorder record.EventRecorder
 	Scheme        *runtime.Scheme
 }

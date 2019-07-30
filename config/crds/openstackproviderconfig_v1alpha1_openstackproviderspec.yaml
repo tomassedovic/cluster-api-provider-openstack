@@ -14,6 +14,12 @@ spec:
   validation:
     openAPIV3Schema:
       properties:
+        allowedAddressPairs:
+          description: Allowed Address Pairs is a list of IP addresses that ports
+            will recognize and accept
+          items:
+            type: string
+          type: array
         apiVersion:
           description: 'APIVersion defines the versioned schema of this representation
             of an object. Servers should convert recognized schemas to the latest

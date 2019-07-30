@@ -195,6 +195,11 @@ func (in *OpenstackProviderSpec) DeepCopyInto(out *OpenstackProviderSpec) {
 			(*in)[i].DeepCopyInto(&(*out)[i])
 		}
 	}
+	if in.AllowedAddressPairs != nil {
+		in, out := &in.AllowedAddressPairs, &out.AllowedAddressPairs
+		*out = make([]string, len(*in))
+		copy(*out, *in)
+	}
 	if in.SecurityGroups != nil {
 		in, out := &in.SecurityGroups, &out.SecurityGroups
 		*out = make([]SecurityGroupParam, len(*in))

@@ -67,10 +67,6 @@ required = [
   version = "kubernetes-1.14.1"
 
 [[override]]
-  name = "k8s.io/client-go"
-  version = "kubernetes-1.14.1"
-
-[[override]]
   name = "sigs.k8s.io/controller-runtime"
   # release-0.2 since it imports kubernetes 1.14
   branch="release-0.2"
